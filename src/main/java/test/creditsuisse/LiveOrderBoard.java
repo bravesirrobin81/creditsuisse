@@ -2,6 +2,8 @@ package test.creditsuisse;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
 
@@ -30,5 +32,11 @@ public class LiveOrderBoard {
 
     public List<Order> getBuyOrders() {
         return unmodifiableList(buyOrders);
+    }
+
+    public List<Price> getOrderBoard() {
+        final Map<Integer, Float> quantities = buyOrders.stream()
+                .collect(Collectors.groupingBy(Order::getPrice, Collectors.reducing(0f, Order::getQuantity, Float::sum)));
+        return quantities.entrySet().stream().map(e -> new Price(e.getKey(), e.getValue())).collect(Collectors.toList());
     }
 }
