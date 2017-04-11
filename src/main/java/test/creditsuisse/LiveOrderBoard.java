@@ -22,6 +22,12 @@ public class LiveOrderBoard {
         buyOrders.add(new Order(userId, price, quantity));
     }
 
+    public void cancelBuyOrder(String userId, int price, float quantity) {
+        if(!buyOrders.removeIf(o -> o.getPrice() == price && o.getQuantity() == quantity && o.getUserId().equals(userId))) {
+            throw new IllegalStateException("No matching order found");
+        }
+    }
+
     public List<Order> getBuyOrders() {
         return unmodifiableList(buyOrders);
     }
