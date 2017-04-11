@@ -11,64 +11,64 @@ import static org.junit.Assert.assertTrue;
 public class LiveOrderBoardTest {
 
     @Test
-    public void shouldRegisterBuyOrder() {
+    public void shouldRegisterOrder() {
         final LiveOrderBoard board = new LiveOrderBoard();
 
-        board.registerBuyOrder("userId", 100, 20f);
+        board.registerOrder("userId", 100, 20f);
 
-        assertEquals(1, board.getBuyOrders().size());
-        final Order order = board.getBuyOrders().get(0);
+        assertEquals(1, board.getOrders().size());
+        final Order order = board.getOrders().get(0);
         assertEquals("userId", order.getUserId());
         assertEquals(100, order.getPrice());
         assertEquals(20f, order.getQuantity(), 0.00001);
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void shouldNotRegisterInvalidBuyOrder() {
+    public void shouldNotRegisterInvalidOrder() {
         final LiveOrderBoard board = new LiveOrderBoard();
 
-        board.registerBuyOrder("userId", -100, 20f);
+        board.registerOrder("userId", -100, 20f);
     }
 
     @Test
-    public void shouldCancelBuyOrder() {
+    public void shouldCancelOrder() {
         final LiveOrderBoard board = new LiveOrderBoard();
-        board.registerBuyOrder("userId", 100, 20f);
+        board.registerOrder("userId", 100, 20f);
 
-        board.cancelBuyOrder("userId", 100, 20f);
+        board.cancelOrder("userId", 100, 20f);
 
-        assertTrue(board.getBuyOrders().isEmpty());
+        assertTrue(board.getOrders().isEmpty());
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotCancelBuyOrderNoPriceMatch() {
+    public void shouldNotCancelOrderNoPriceMatch() {
         final LiveOrderBoard board = new LiveOrderBoard();
-        board.registerBuyOrder("userId", 100, 20f);
+        board.registerOrder("userId", 100, 20f);
 
-        board.cancelBuyOrder("userId", 99, 20f);
+        board.cancelOrder("userId", 99, 20f);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotCancelBuyOrderNoQuantityMatch() {
+    public void shouldNotCancelOrderNoQuantityMatch() {
         final LiveOrderBoard board = new LiveOrderBoard();
-        board.registerBuyOrder("userId", 100, 20f);
+        board.registerOrder("userId", 100, 20f);
 
-        board.cancelBuyOrder("userId", 100, 10f);
+        board.cancelOrder("userId", 100, 10f);
     }
 
     @Test(expected = IllegalStateException.class)
-    public void shouldNotCancelBuyOrderNoUserIdMatch() {
+    public void shouldNotCancelOrderNoUserIdMatch() {
         final LiveOrderBoard board = new LiveOrderBoard();
-        board.registerBuyOrder("userId", 100, 20f);
+        board.registerOrder("userId", 100, 20f);
 
-        board.cancelBuyOrder("anotherUser", 100, 20f);
+        board.cancelOrder("anotherUser", 100, 20f);
     }
 
     @Test
     public void shouldCombineOrdersAtSamePriceLevel() {
         final LiveOrderBoard board = new LiveOrderBoard();
-        board.registerBuyOrder("userId", 100, 20f);
-        board.registerBuyOrder("userId", 100, 5f);
+        board.registerOrder("userId", 100, 20f);
+        board.registerOrder("userId", 100, 5f);
 
         final List<Price> prices = board.getOrderBoard();
 
@@ -80,10 +80,10 @@ public class LiveOrderBoardTest {
     @Test
     public void shouldSortOrdersDescendingPrices() {
         final LiveOrderBoard board = new LiveOrderBoard();
-        board.registerBuyOrder("userId", 95, 20f);
-        board.registerBuyOrder("userId", 100, 5f);
-        board.registerBuyOrder("userId", 100, 5f);
-        board.registerBuyOrder("userId", 95, 20f);
+        board.registerOrder("userId", 95, 20f);
+        board.registerOrder("userId", 100, 5f);
+        board.registerOrder("userId", 100, 5f);
+        board.registerOrder("userId", 95, 20f);
 
         final List<Price> prices = board.getOrderBoard();
 
