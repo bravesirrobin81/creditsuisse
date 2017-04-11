@@ -1,8 +1,6 @@
 package test.creditsuisse;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static java.util.Collections.unmodifiableList;
@@ -13,10 +11,18 @@ import static java.util.Collections.unmodifiableList;
  * Assumptions:
  * 1. Order quantity and price must be +ve; no counter-examples given in requirements
  * 2. Price is an integer; no counter-examples are given in requirements
- * 3. Buy and sell orders are displayed separately; inferred from different sorting requirements
+ * 3. Buy and sell orders are displayed separately; inferred from different sorting requirements, in this case requiring two instances of LiveOrderBoard to track.
+ * 4. No consideration has been given to mulit-threaded access.
  *
  */
 public class LiveOrderBoard {
+    public static final Comparator<Price> BUY_ORDER = (p, o) -> -Integer.compare(p.getPrice(), o.getPrice());
+    public static final Comparator<Price> SELL_ORDER = Comparator.comparingInt(Price::getPrice);
+    private final Comparator<Price> ordering;
+
+    public LiveOrderBoard(Comparator<Price> orderType) {
+        this.ordering = orderType;
+    }
 
     private List<Order> buyOrders = new ArrayList<>();
 
@@ -37,6 +43,8 @@ public class LiveOrderBoard {
     public List<Price> getOrderBoard() {
         final Map<Integer, Float> quantities = buyOrders.stream()
                 .collect(Collectors.groupingBy(Order::getPrice, Collectors.reducing(0f, Order::getQuantity, Float::sum)));
-        return quantities.entrySet().stream().map(e -> new Price(e.getKey(), e.getValue())).collect(Collectors.toList());
+        final List<Price> prices = (quantities.entrySet().stream().map(e -> new Price(e.getKey(), e.getValue())).collect(Collectors.toList()));
+        prices.sort(ordering);
+        return prices;
     }
 }

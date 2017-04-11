@@ -7,12 +7,14 @@ import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static test.creditsuisse.LiveOrderBoard.BUY_ORDER;
+import static test.creditsuisse.LiveOrderBoard.SELL_ORDER;
 
 public class LiveOrderBoardTest {
 
     @Test
     public void shouldRegisterOrder() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
 
         board.registerOrder("userId", 100, 20f);
 
@@ -25,14 +27,14 @@ public class LiveOrderBoardTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void shouldNotRegisterInvalidOrder() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
 
         board.registerOrder("userId", -100, 20f);
     }
 
     @Test
     public void shouldCancelOrder() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
         board.registerOrder("userId", 100, 20f);
 
         board.cancelOrder("userId", 100, 20f);
@@ -42,7 +44,7 @@ public class LiveOrderBoardTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotCancelOrderNoPriceMatch() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
         board.registerOrder("userId", 100, 20f);
 
         board.cancelOrder("userId", 99, 20f);
@@ -50,7 +52,7 @@ public class LiveOrderBoardTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotCancelOrderNoQuantityMatch() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
         board.registerOrder("userId", 100, 20f);
 
         board.cancelOrder("userId", 100, 10f);
@@ -58,7 +60,7 @@ public class LiveOrderBoardTest {
 
     @Test(expected = IllegalStateException.class)
     public void shouldNotCancelOrderNoUserIdMatch() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
         board.registerOrder("userId", 100, 20f);
 
         board.cancelOrder("anotherUser", 100, 20f);
@@ -66,7 +68,7 @@ public class LiveOrderBoardTest {
 
     @Test
     public void shouldCombineOrdersAtSamePriceLevel() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
         board.registerOrder("userId", 100, 20f);
         board.registerOrder("userId", 100, 5f);
 
@@ -79,7 +81,7 @@ public class LiveOrderBoardTest {
 
     @Test
     public void shouldSortOrdersDescendingPrices() {
-        final LiveOrderBoard board = new LiveOrderBoard();
+        final LiveOrderBoard board = new LiveOrderBoard(BUY_ORDER);
         board.registerOrder("userId", 95, 20f);
         board.registerOrder("userId", 100, 5f);
         board.registerOrder("userId", 100, 5f);
@@ -92,4 +94,21 @@ public class LiveOrderBoardTest {
         assertEquals(100, prices.get(0).getPrice());
 
     }
+
+    @Test
+    public void shouldSortOrdersAscendingPrices() {
+        final LiveOrderBoard board = new LiveOrderBoard(SELL_ORDER);
+        board.registerOrder("userId", 95, 20f);
+        board.registerOrder("userId", 100, 5f);
+        board.registerOrder("userId", 100, 5f);
+        board.registerOrder("userId", 95, 20f);
+
+        final List<Price> prices = board.getOrderBoard();
+
+        assertEquals(2, prices.size());
+        assertEquals(40f, prices.get(0).getQuantity(), 0.0001);
+        assertEquals(95, prices.get(0).getPrice());
+
+    }
+
 }
